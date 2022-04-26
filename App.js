@@ -1,33 +1,123 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,TextInput,Button,useState } from 'react-native';
+import { StyleSheet, Text, View,TextInput,Button} from 'react-native';
+import { useState } from 'react';
 import Header from './components/Header';
 
+const array = new Array(10);
+for(var i  = 0;i < 10; i++){
+  array[i] = new Array(10);
+}
+let gra = [ [ 0, 16, 13, 0, 0, 0 ],
+              [ 0, 0, 10, 12, 0, 0 ],
+              [ 0, 4, 0, 0, 14, 0 ], 
+              [ 0, 0, 9, 0, 0, 20 ],
+              [ 0, 0, 0, 7, 0, 4 ],  
+              [ 0, 0, 0, 0, 0, 0 ] ];
+
+
 export default function App() {
-  const [row,setRow] = useState(" ")
-  const [col,setCol] = useState(" ")
-  const [value,setValue] = useState(" ")
-  // const [todos,setTodos] =useState([
-  //   {value:5,key1:'1',key:'1'},
-  //   {value:6,key1:'1',key:'2'},
-  //   {value:7,key1:'1',key:'3'}
-  // ]);
-  var items = [
-    [1, 2],
-    [3, 4],
-    [5, 6]
-  ];
-  const submitTodo = (val1,val2) => {
-    items[val1][val2]=val3
+  const [size, setSize] = useState(6);
+  const [row,setRow] = useState(0);
+  const [col,setCol] = useState(0);
+  const [value, setValue] = useState(0);
+  const [result, setResult] = useState(0);
+  // console.log(array);
+  function bfs(rGraph, s, t, parent)
+{
+    let visited = new Array(size);
+    for(let i = 0; i < size; ++i)
+        visited[i] = false;
+    let queue  = [];
+    queue.push(s);
+    visited[s] = true;
+    parent[s] = -1;
+ 
+    // Standard BFS Loop
+    while (queue.length != 0)
+    {
+        let u = queue.shift();
+ 
+        for(let v = 0; v < size; v++)
+        {
+            if (visited[v] == false &&
+                rGraph[u][v] > 0)
+            {
+                if (v == t)
+                {
+                    parent[v] = u;
+                    return true;
+                }
+                queue.push(v);
+                parent[v] = u;
+                visited[v] = true;
+            }
+        }
+    }
+    return false;
+}
+ 
+// Returns the maximum flow from s to t in
+// the given graph
+function fordFulkerson(graph, s, t)
+{
+    let u, v;
+    let rGraph = new Array(size);
+ 
+    for(u = 0; u < size; u++)
+    {
+        rGraph[u] = new Array(size);
+        for(v = 0; v < size; v++)
+            rGraph[u][v] = graph[u][v];
+     }
+    let parent = new Array(size);
+    let max_flow = 0;
+    while (bfs(rGraph, s, t, parent))
+    {
+        let path_flow = Number.MAX_VALUE;
+        for(v = t; v != s; v = parent[v])
+        {
+            u = parent[v];
+            path_flow = Math.min(path_flow,
+                                 rGraph[u][v]);
+        }
+        for(v = t; v != s; v = parent[v])
+        {
+            u = parent[v];
+            rGraph[u][v] -= path_flow;
+            rGraph[v][u] += path_flow;
+        }
+        max_flow += path_flow;
+    }
+    return max_flow;
+}
+  function handleSubmit(row, col, value){
+    array[row][col] = value;
+    console.log(array[row][col]);
   }
-  return (
-    <View style={styles.container}>
+
+  function showValue(){
+    let value = 10;
+    value = fordFulkerson(array, 0, 5);
+    // console.log(value);
+    setResult(value);
+  }
+  // const [todos,setTodos] =useState([
+    //   {value:5,key1:'1',key:'1'},
+    //   {value:6,key1:'1',key:'2'},
+    //   {value:7,key1:'1',key:'3'}
+    // ]);
+    return (
+      <View style={styles.container}>
       <Header/>
+      <TextInput 
+          style={styles.inputtodos2}
+          placeholder='Array Size'
+          onChangeText={(val) => setSize(val)}
+      />
       <View style={styles.container3}>
-        <TextInput 
+        <Text
             style={styles.inputtodos2}
-            placeholder='value'
-            onChangeText={(val3) => setValue(val3)}
-        />
+        >{result} </Text>
       </View>
       <View style={styles.container2}>
         <TextInput 
@@ -46,7 +136,7 @@ export default function App() {
        <Button
             title='Submit'
             color={'coral'}
-            onPress={() => submitTodo(newtodo)}
+            onPress={() => handleSubmit(row-1, col-1, value)}
        />
       </View>
 
@@ -54,7 +144,7 @@ export default function App() {
         <TextInput 
             style={styles.inputtodos2}
             placeholder='value'
-            onChangeText={(val) => setNewtodo(val)}
+            onChangeText={(val) => setValue(val)}
         />
       </View>
 
@@ -62,7 +152,7 @@ export default function App() {
        <Button
             title='Submit'
             color={'coral'}
-            onPress={() => submitTodo(newtodo)}
+            onPress={() => showValue()}
        />
       </View>
       
