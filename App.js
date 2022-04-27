@@ -1,7 +1,14 @@
 import { StatusBar } from 'expo-status-bar';
-import { StyleSheet, Text, View,TextInput,Button} from 'react-native';
-import { useState } from 'react';
+import { StyleSheet, Text, View,TextInput,Button,Switch,ScrollView} from 'react-native';
+import { useState,useEffect,useContext} from 'react';
 import Header from './components/Header';
+import { EventRegister } from 'react-native-event-listeners';
+
+import themeContext from './components/themeContext';
+import theme from './components/theme';
+import { backgroundColor } from 'react-native/Libraries/Components/View/ReactNativeStyleAttributes';
+// import { TouchableOpacity } from 'react-native-web';
+
 
 const array = new Array(10);
 for(var i  = 0;i < 10; i++){
@@ -16,6 +23,21 @@ let gra = [ [ 0, 16, 13, 0, 0, 0 ],
 
 
 export default function App() {
+  const theme = useContext(themeContext);
+  const [mode,setMode] = useState(false);
+
+  // useEffect(() => {
+  //   let eventListener = EventRegister.addEventListener(
+  //     "changeTheme",(data) => {
+  //       setMode(data);
+  //       console.log(data);
+      
+  //     });
+  //   return () => {
+  //     EventRegister.removeEventListener(eventListener);
+  //   };
+  // });
+
   const [size, setSize] = useState(6);
   const [row,setRow] = useState(0);
   const [col,setCol] = useState(0);
@@ -107,19 +129,34 @@ function fordFulkerson(graph, s, t)
     //   {value:7,key1:'1',key:'3'}
     // ]);
     return (
-      <View style={styles.container}>
+      // <themeContext.Provider value = {mode === "true" ? theme.dark : theme.light}>
+
+    <ScrollView style={[styles.container,{backgroundColor:(mode ? '#8D6262' : '#fff')}]}>
+      
       <Header/>
-      <TextInput 
+      <Switch 
+        value={mode}
+        // onValueChange={() => 
+        //   {setMode((value) => !value);
+        //   //  EventRegister.emit("changeTheme",mode);
+        
+        // }}
+        onValueChange={() => setMode((value) => !value)}
+        
+      />
+      
+      <View style={styles.container3}>
+        <TextInput 
           style={styles.inputtodos2}
           placeholder='Array Size'
           onChangeText={(val) => setSize(val)}
-      />
-      <View style={styles.container3}>
+        />
         <Text
-            style={styles.inputtodos2}
+            style={styles.inputtodosans}
         >{result} </Text>
       </View>
       <View style={styles.container2}>
+        
         <TextInput 
             style={styles.inputtodos}
             placeholder='row'
@@ -135,7 +172,7 @@ function fordFulkerson(graph, s, t)
       <View style={styles.container4}>
        <Button
             title='Submit'
-            color={'coral'}
+            color={'#ED8D8D'}
             onPress={() => handleSubmit(row-1, col-1, value)}
        />
       </View>
@@ -149,15 +186,22 @@ function fordFulkerson(graph, s, t)
       </View>
 
       <View style={styles.container4}>
-       <Button
+      <Button
             title='Submit'
-            color={'coral'}
+            color={'#ED8D8D'}
             onPress={() => showValue()}
        />
+       {/* <TouchableOpacity
+            // title='Submit'
+            // color=(mode ? 'coral' : '#8D6262')
+            onPress={() => showValue()}
+       >Submit<TouchableOpacity/> */}
       </View>
       
       <StatusBar style="auto" />
-    </View>
+      
+    </ScrollView>
+    // </themeContext.Provider>
   );
 }
 
@@ -174,12 +218,10 @@ const styles = StyleSheet.create({
     fontSize:18,
     borderStyle:'dashed',
     borderColor:'#ddd',
-    // marginBottom:20,
-    // marginLeft:5,
-    // marginRight:5,
     width:'45%',
     margin:7,
     borderRadius:5,
+    color:'#3b3535'
     
     
 
@@ -193,6 +235,21 @@ const styles = StyleSheet.create({
     borderColor:'#ddd',
     margin:10,
     borderRadius:5,
+    color:'#3b3535'
+    
+    
+
+ },
+ inputtodosans:{
+    padding:10,
+    paddingLeft:15,
+    borderWidth:3,
+    fontSize:18,
+    // borderStyle:'dashed',
+    borderColor:'#ED8D8D',
+    margin:10,
+    borderRadius:5,
+    color:'#ED8D8D',
     
     
 
@@ -214,6 +271,7 @@ const styles = StyleSheet.create({
   marginLeft:40,
   marginRight:40,
   marginBottom:10,
+  marginTop:20,
  },
  container4:{
   // backgroundColor:'grey',
